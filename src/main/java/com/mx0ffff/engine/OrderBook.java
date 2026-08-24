@@ -31,6 +31,8 @@ public class OrderBook {
                 removed = true;
             }
         }
+        bids.values().removeIf(Queue::isEmpty);
+        asks.values().removeIf(Queue::isEmpty);
         return removed;
 
     }
