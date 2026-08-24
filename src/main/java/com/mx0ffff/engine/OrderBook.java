@@ -18,6 +18,20 @@ public class OrderBook {
     }
 
     public boolean cancelOrder(String orderId) {
+        boolean removed = false;
+
+        for (Queue<Order> level : bids.values()) {
+            if (level.removeIf(order -> order.getId().equals(orderId))) {
+                removed = true;
+            }
+        }
+
+        for (Queue<Order> level : asks.values()) {
+            if (level.removeIf(order-> order.getId().equals(orderId))) {
+                removed = true;
+            }
+        }
+        return removed;
 
     }
 
