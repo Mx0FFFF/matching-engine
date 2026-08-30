@@ -1,7 +1,15 @@
 package com.mx0ffff.engine;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.NavigableMap;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.TreeMap;
+import java.util.UUID;
 
 public class OrderBook {
     private final NavigableMap<Long, Queue<Order>> bids;
@@ -10,6 +18,9 @@ public class OrderBook {
 
     public OrderBook (String symbol) {
         this.symbol = symbol;
+        // Bids sort descending so firstKey() is the highest, aka the best bid
+        // Asks sort naturally so firstKey() is the lowest ask, aka the best ask
+        // both sides use firstKey(), so matching logic doesn't branch on side
         this.bids = new TreeMap<>(Comparator.reverseOrder());
         this.asks = new TreeMap<>();
     }
@@ -25,16 +36,20 @@ public class OrderBook {
         //Find best bid from either side
         //Take the best order, decide the quantity and price, reduce quantity on both and the build a Trade
 
-        NavigableMap<Long, Queue<Order>> opposite = (order.getSide() == Side.BUY) ? asks : bids;
+        NavigableMap<Long, Queue<Order>> oppositeSide = (order.getSide() == Side.BUY) ? asks : bids;
+        NavigableMap<Long, Queue<Order>> sameSide = (order.getSide() == Side.BUY) ? bids : asks;
         List<Trade> trades = new ArrayList<>();
-        while (order.getQuantity() > 0 && !opposite.isEmpty() && crosses(order, opposite.firstKey())) {
-            long bestPrice = opposite.firstKey();
-            Queue<Order> level = opposite.get(bestPrice);
+        while (order.getQuantity() > 0 && !oppositeSide.isEmpty() && crosses(order, oppositeSide.firstKey())) {
+            long bestPrice = oppositeSide.firstKey();
+            Queue<Order> level = oppositeSide.get(bestPrice);
             Order resting = level.peek();
             int tradeQuantity = Math.min(order.getQuantity(), resting.getQuantity());
-            long tradePrice = bestPrice;
+            // The incoming order's price is only a limit, a ceiling for buys, a floor for sells.
+            // Each trade prints at the price the resting order commited to
+            long tradePrice = resting.getPrice();
             order.reduceQuantity(tradeQuantity);
             resting.reduceQuantity(tradeQuantity);
+
             String buyOrderId = (order.getSide() == Side.BUY) ? order.getId() : resting.getId();
             String sellOrderId = (order.getSide() == Side.SELL) ? order.getId() : resting.getId();
 
@@ -54,10 +69,15 @@ public class OrderBook {
             if (resting.getQuantity() == 0) {
                 level.poll();
                 if (level.isEmpty()) {
-                    opposite.remove(bestPrice);
+                    oppositeSide.remove(bestPrice);
                 }
             }
 
+
+        }
+
+        if (order.getQuantity() > 0) {
+            sameSide.computeIfAbsent(order.getPrice(), k -> new LinkedList<>()).add(order);
         }
         return trades;
     }
