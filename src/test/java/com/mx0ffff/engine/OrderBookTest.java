@@ -17,6 +17,6 @@ class OrderBookTest {
         assertEquals(2, trades.size());
         assertEquals(100, trades.get(0).quantity());
         assertEquals(20, trades.get(1).quantity());
-        assertEquals(book.bestBid(), Optional.of(9900L));
+        assertEquals(Optional.of(9900L), book.bestBid());
     }
 }
