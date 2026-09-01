@@ -19,4 +19,17 @@ class OrderBookTest {
         assertEquals(20, trades.get(1).quantity());
         assertEquals(Optional.of(9900L), book.bestBid());
     }
+
+
+    // Vandring over to prisnivåer. A1 (80 @ 10100), A2 (150 @ 10200), så BUY 200 @ 10300 → to handler, til 10100 og 10200. Verifiserer prisforbedring og at nivået slettes.
+
+    void buyWalksTwoPriceLevels () {
+        OrderBook book = new OrderBook("GMC");
+        book.submitOrder(new Order("A1",Side.SELL, 80, 10100L, Instant.now()));
+        book.submitOrder(new Order("A2",Side.SELL, 150, 10200L, Instant.now()));
+        List<Trade> trades = book.submitOrder(new Order("B1", Side.BUY, 200, 10300L, Instant.now()));
+        assertEquals(80, trades.get(0).quantity());
+        assertEquals(120, trades.get(1).quantity());
+        assertEquals(book.bestBid(), Optional.of(10200L));
+    }
 }
