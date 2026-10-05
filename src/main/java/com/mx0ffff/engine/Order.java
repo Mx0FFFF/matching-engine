@@ -12,6 +12,7 @@ public class Order {
 
     // Constructor
     public Order (String id, Side side, int quantity, long price, Instant timestamp) {
+        priceControl(price);
         this.id = id;
         this.side = side;
         this.quantity = quantity;
@@ -29,6 +30,12 @@ public class Order {
             throw new IllegalArgumentException("Cannot reduce because " + amount + " is larger than " + quantity);
         }
         this.quantity -= amount;
+    }
+
+    private void priceControl (long price) {
+        if (price <= 0) {
+            throw new IllegalArgumentException("Cannot create order because price is less than or equal to zero");
+        }
     }
 
     // Getters

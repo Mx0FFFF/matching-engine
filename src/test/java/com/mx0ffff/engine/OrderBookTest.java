@@ -60,4 +60,9 @@ class OrderBookTest {
         assertTrue(trades.isEmpty());
         assertEquals(Optional.of(9900L), book.bestBid());
     }
+
+    @Test
+    void zeroPriceOrder() {
+        assertThrows(IllegalArgumentException.class, () -> new Order("B1", Side.BUY, 120,0L, Instant.now()));
+    }
 }
