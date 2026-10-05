@@ -65,4 +65,9 @@ class OrderBookTest {
     void zeroPriceOrder() {
         assertThrows(IllegalArgumentException.class, () -> new Order("B1", Side.BUY, 120,0L, Instant.now()));
     }
+
+    @Test
+    void belowZeroPriceOrder() {
+        assertThrows(IllegalArgumentException.class, () -> new Order("B1", Side.BUY, 120, -20L, Instant.now()));
+    }
 }
