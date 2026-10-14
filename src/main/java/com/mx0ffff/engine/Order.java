@@ -13,6 +13,9 @@ public class Order {
     // Constructor
     public Order (String id, Side side, int quantity, long price, Instant timestamp) {
         priceControl(price);
+        nullSideValidation(side);
+
+
         this.id = id;
         this.side = side;
         this.quantity = quantity;
@@ -35,6 +38,13 @@ public class Order {
     private void priceControl (long price) {
         if (price <= 0) {
             throw new IllegalArgumentException("Cannot create order because price is less than or equal to zero");
+        }
+    }
+
+    // Create validation for when someone submits and order with no side value
+    private void nullSideValidation (Side side) {
+        if (side == null) {
+            throw new IllegalArgumentException("Order side cannot be null");
         }
     }
 

@@ -37,8 +37,11 @@ public class OrderBook {
         //Take the best order, decide the quantity and price, reduce quantity on both and the build a Trade
 
         NavigableMap<Long, Queue<Order>> oppositeSide = (order.getSide() == Side.BUY) ? asks : bids;
+
         NavigableMap<Long, Queue<Order>> sameSide = (order.getSide() == Side.BUY) ? bids : asks;
+
         List<Trade> trades = new ArrayList<>();
+
         while (order.getQuantity() > 0 && !oppositeSide.isEmpty() && crosses(order, oppositeSide.firstKey())) {
             long bestPrice = oppositeSide.firstKey();
             Queue<Order> level = oppositeSide.get(bestPrice);
