@@ -14,7 +14,8 @@ public class Order {
     public Order (String id, Side side, int quantity, long price, Instant timestamp) {
         priceControl(price);
         nullSideValidation(side);
-
+        negativeQuantityValidation(quantity);
+        zeroQuantityValidation(quantity);
 
         this.id = id;
         this.side = side;
@@ -45,6 +46,20 @@ public class Order {
     private void nullSideValidation (Side side) {
         if (side == null) {
             throw new IllegalArgumentException("Order side cannot be null");
+        }
+    }
+
+    // Create quantity validation for negative order quantities
+    private void negativeQuantityValidation (int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Cannot submit order because quantity: " + quantity + " is below zero");
+        }
+    }
+
+    // Create quantity validation for zero order quantities
+    private void zeroQuantityValidation(int quantity) {
+        if (quantity == 0) {
+            throw new IllegalArgumentException("Cannot submit order because quantity: " + quantity + " is zero");
         }
     }
 

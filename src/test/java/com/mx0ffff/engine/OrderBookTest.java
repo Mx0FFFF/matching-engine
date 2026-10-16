@@ -75,4 +75,14 @@ class OrderBookTest {
     void nullSideOrder() {
         assertThrows(IllegalArgumentException.class, () -> new Order("B1", null, 120, 20L, Instant.now()));
     }
+
+    @Test
+    void belowZeroQuantityOrder() {
+        assertThrows(IllegalArgumentException.class, () -> new Order("B1", Side.BUY, -120, 9900L, Instant.now()));
+    }
+
+    @Test
+    void zeroQuantityOrder() {
+        assertThrows(IllegalArgumentException.class, () -> new Order("B1", Side.BUY, 0, 9900L, Instant.now()));
+    }
 }
